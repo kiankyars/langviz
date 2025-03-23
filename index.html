@@ -16,14 +16,21 @@
         select {
             padding: 5px;
             margin: 5px;
+            width: 200px;
+        }
+        .control-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            margin-left: 10px;
         }
     </style>
-    <!-- More reliable CDN sources -->
     <script src="scripts/globe.gl.js"></script>
     <script src="scripts/d3.js"></script>
 </head>
 <body>
     <div id="controls">
+        <label class="control-label">Change Map Style:</label>
         <select id="mapStyle" onchange="changeMapStyle(this.value)">
             <option value="earth-blue-marble.jpg">Blue Marble</option>
             <option value="earth-day.jpg">Day</option>
@@ -33,11 +40,28 @@
     </div>
     <div id="globeViz"></div>
     <script>
+        // Color hashing function
+        function hashStringToColor(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            // Convert hash to HSL color
+            // Using HSL for better color distribution
+            const h = hash % 360;
+            return `hsl(${h}, 70%, 50%)`;
+        }
+
         const world = Globe()
             .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
             .pointOfView({ lat: 0, lng: 0, altitude: 2.5 })
-            .pointRadius(0.3)
-            .pointColor(() => '#ff0000')
+            .pointRadius(0.15)
+            .pointColor(d => {
+                // Take first country code (first two letters)
+                const countryCode = d.countrycodes.substring(0, 2);
+                return hashStringToColor(countryCode);
+            })
             .pointAltitude(0.1)
             .pointLabel(d => `
                 <div style="color: white; background: rgba(0,0,0,0.75); padding: 5px; border-radius: 5px;">
