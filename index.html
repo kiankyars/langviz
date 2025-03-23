@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style> body { margin: 0; } </style>
+    <!-- More reliable CDN sources -->
+    <script src="scripts/globe.gl.js"></script>
+    <script src="scripts/d3.js"></script>
+</head>
+<body>
+    <div id="globeViz"></div>
+    <script>
+        const world = Globe()
+            .globeImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+            .pointOfView({ lat: 0, lng: 0, altitude: 2.5 })
+            .pointRadius(0.3)
+            .pointColor(() => '#ff0000')
+            .pointAltitude(0.1)
+            .pointLabel(d => `
+                <div style="color: white; background: rgba(0,0,0,0.75); padding: 5px; border-radius: 5px;">
+                    <b>${d.Name}</b><br/>
+                    Family: ${d.family}<br/>
+                    Genus: ${d.genus}<br/>
+                    Country: ${d.countrycodes}
+                </div>
+            `)
+            (document.getElementById('globeViz'));
+
+        // Load and process your CSV data
+        d3.csv('language.csv').then(data => {
+            world.pointsData(data.map(d => ({
+                lat: +d.latitude,
+                lng: +d.longitude,
+                Name: d.Name,
+                family: d.family,
+                genus: d.genus,
+                countrycodes: d.countrycodes
+            })));
+        });
+    </script>
+</body>
+</html>
