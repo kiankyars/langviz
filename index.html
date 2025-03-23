@@ -1,16 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style> body { margin: 0; } </style>
+    <style> 
+        body { margin: 0; }
+        #controls {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+        }
+        select {
+            padding: 5px;
+            margin: 5px;
+        }
+    </style>
     <!-- More reliable CDN sources -->
     <script src="scripts/globe.gl.js"></script>
     <script src="scripts/d3.js"></script>
 </head>
 <body>
+    <div id="controls">
+        <select id="mapStyle" onchange="changeMapStyle(this.value)">
+            <option value="earth-blue-marble.jpg">Blue Marble</option>
+            <option value="earth-day.jpg">Day</option>
+            <option value="earth-night.jpg">Night</option>
+            <option value="earth-topology.png">Topology</option>
+        </select>
+    </div>
     <div id="globeViz"></div>
     <script>
         const world = Globe()
-            .globeImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+            .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
             .pointOfView({ lat: 0, lng: 0, altitude: 2.5 })
             .pointRadius(0.3)
             .pointColor(() => '#ff0000')
@@ -20,10 +44,15 @@
                     <b>${d.Name}</b><br/>
                     Family: ${d.family}<br/>
                     Genus: ${d.genus}<br/>
-                    Country: ${d.countrycodes}
+                    Country: ${d.countrycodes}<br/>
+                    Macroarea: ${d.macroarea}
                 </div>
             `)
             (document.getElementById('globeViz'));
+
+        function changeMapStyle(style) {
+            world.globeImageUrl(`https://unpkg.com/three-globe/example/img/${style}`);
+        }
 
         // Load and process your CSV data
         d3.csv('language.csv').then(data => {
@@ -33,7 +62,8 @@
                 Name: d.Name,
                 family: d.family,
                 genus: d.genus,
-                countrycodes: d.countrycodes
+                countrycodes: d.countrycodes,
+                macroarea: d.macroarea
             })));
         });
     </script>
